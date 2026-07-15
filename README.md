@@ -1,17 +1,30 @@
-# meu_app_rotina
+# 🌌 Meu App de Rotina & Autoconhecimento
 
-A new Flutter project.
+Um aplicativo pessoal desenvolvido em **Flutter** com foco em organização diária, acompanhamento de ciclos corporais e registros astrológicos. 
 
-## Getting Started
+## ✨ Funcionalidades
 
-This project is a starting point for a Flutter application.
+O aplicativo está modularizado e dividido em três frentes principais:
 
-A few resources to get you started if this is your first Flutter project:
+* **Hoje:** Um gerenciador de tarefas diárias para organizar a rotina, categorizando atividades de limpeza, estudos, saúde e bem-estar.
+* **Meu Corpo & Ciclo:** Um painel de monitoramento dinâmico que alterna entre o controle de ciclo natural e o acompanhamento de hormonização. Conta com indicativos visuais fluidos e animações que representam equilíbrio e transição.
+* **Céu & Diário:** Uma aba dedicada aos trânsitos astrológicos diários e um diário de texto livre para anotações sobre tiragens de Tarô, percepções e humores.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## 🎨 Identidade Visual e UI/UX
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+O design foi construído sobre o **Material 3** e gira em torno de um conceito visual que conecta a vastidão do espaço e das galáxias com o simbolismo e as cores da bandeira trans.
+
+* **Paleta de Cores:** Transições de roxo, lilás, azul e ciano.
+* **Tipografia:** Fonte serifada customizada (`Scorpius`), garantindo uma estética imersiva e mística na leitura do diário.
+* **Múltiplos Temas:** Suporte nativo e controle manual para alternar entre **Modo Claro** (suave e focado no lilás) e **Modo Escuro** (fundo cósmico ultra escuro com contrastes em ciano/neon).
+
+## 🛠️ Tecnologias e Arquitetura
+
+* **Framework:** Flutter / Dart
+* **Componentes:** Material Design 3
+* **Arquitetura:** Código escalável com separação clara de responsabilidades (pastas `lib/telas/` e `lib/modelos/`).
+* **Gerenciamento de Estado:** Nativo (State hoisting no `MaterialApp` para controle de temas e estados locais nas abas).
+
+## 🚀 Como executar o projeto
+
+1. Em breve
