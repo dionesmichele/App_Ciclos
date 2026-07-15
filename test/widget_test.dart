@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 // --- TELA PRINCIPAL (NAVEGAÇÃO) ---
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
