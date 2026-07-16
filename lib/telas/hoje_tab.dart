@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../modelos/tarefa.dart';
+import '../servicos/database_helper.dart';
 
 class TodayTab extends StatefulWidget {
   const TodayTab({super.key});
@@ -9,16 +9,33 @@ class TodayTab extends StatefulWidget {
 }
 
 class _TodayTabState extends State<TodayTab> {
-  final List<Task> tasks = [
-    Task(title: 'Varrer a casa', category: 'Limpeza', icon: Icons.cleaning_services),
-    Task(title: 'Entregar resenha', category: 'Faculdade', icon: Icons.book),
-    Task(title: 'Fazer exercício', category: 'Saúde', icon: Icons.fitness_center),
-    Task(title: 'Beber água', category: 'Hidratação', icon: Icons.local_drink),
-    Task(title: 'Fazer comida', category: 'Alimentação', icon: Icons.kitchen),
-  ];
-
+  List<Map<String, dynamic>> _tasks = [];
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _categoriaController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks();
+  }
+
+  Future<void> _loadTasks() async {
+    final tasks = await DatabaseHelper.instance.getTasks();
+    setState(() {
+      _tasks = tasks;
+    });
+  }
+
+  void _addTask() async {
+    if (_tituloController.text.trim().isEmpty) return;
+    
+    final categoria = _categoriaController.text.isNotEmpty ? _categoriaController.text : 'Geral';
+    await DatabaseHelper.instance.insertTask(_tituloController.text, categoria);
+    
+    _tituloController.clear();
+    _categoriaController.clear();
+    _loadTasks(); // Recarrega a lista do banco de dados
+  }
 
   void _mostrarJanelaNovaTarefa() {
     showDialog(
@@ -50,18 +67,8 @@ class _TodayTabState extends State<TodayTab> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (_tituloController.text.isNotEmpty) {
-                  setState(() {
-                    tasks.add(Task(
-                      title: _tituloController.text,
-                      category: _categoriaController.text.isNotEmpty ? _categoriaController.text : 'Geral',
-                      icon: Icons.task_alt,
-                    ));
-                  });
-                  _tituloController.clear();
-                  _categoriaController.clear();
-                  Navigator.pop(context);
-                }
+                _addTask();
+                Navigator.pop(context);
               },
               child: const Text('Adicionar'),
             ),
@@ -74,24 +81,61 @@ class _TodayTabState extends State<TodayTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          final task = tasks[index];
-          return ListTile(
-            leading: Icon(task.icon),
-            title: Text(task.title),
-            subtitle: Text(task.category),
-            trailing: Checkbox(
-              value: task.isCompleted,
-              onChanged: (value) {
-                setState(() {
-                  task.isCompleted = value ?? false;
-                });
-              },
-            ),
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _tasks.isEmpty
+            ? const Center(
+                child: Text(
+                  'Nenhuma tarefa para hoje.\nRelaxe e aproveite!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+              )
+            : ListView.builder(
+                itemCount: _tasks.length,
+                itemBuilder: (context, index) {
+                  final task = _tasks[index];
+                  final isCompleted = task['completed'] == 1;
+                  
+                  return Dismissible(
+                    key: Key(task['id']),
+                    background: Container(
+                      color: Colors.redAccent,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20),
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) async {
+                      await DatabaseHelper.instance.deleteTask(task['id']);
+                      _loadTasks();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Tarefa excluída!')),
+                      );
+                    },
+                    child: Card(
+                      elevation: 1,
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      child: CheckboxListTile(
+                        activeColor: Theme.of(context).colorScheme.primary,
+                        title: Text(
+                          task['title'],
+                          style: TextStyle(
+                            decoration: isCompleted ? TextDecoration.lineThrough : null,
+                            color: isCompleted ? Colors.grey : null,
+                          ),
+                        ),
+                        subtitle: Text(task['category']),
+                        value: isCompleted,
+                        onChanged: (val) async {
+                          await DatabaseHelper.instance.updateTaskStatus(task['id'], val! ? 1 : 0);
+                          _loadTasks();
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _mostrarJanelaNovaTarefa,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../servicos/database_helper.dart';
 
 class AstrosTab extends StatefulWidget {
   const AstrosTab({super.key});
@@ -8,13 +9,31 @@ class AstrosTab extends StatefulWidget {
 }
 
 class _AstrosTabState extends State<AstrosTab> {
-  final TextEditingController _tarotController = TextEditingController();
   final TextEditingController _pensamentosController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDiary();
+  }
+
+  // Busca o texto salvo no banco de dados para o dia de hoje
+  Future<void> _loadDiary() async {
+    final content = await DatabaseHelper.instance.getDiaryToday();
+    setState(() {
+      _pensamentosController.text = content;
+    });
+  }
+
+  // Salva o texto automaticamente a cada letra digitada
+  void _saveDiary(String value) {
+    DatabaseHelper.instance.saveDiary(value);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,63 +67,35 @@ class _AstrosTabState extends State<AstrosTab> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            Card(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              elevation: 0,
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('♓ Peixes (Sol)', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('A intuição está altíssima hoje. Confie nos seus instintos.'),
-                    Divider(height: 20),
-                    Text('♑ Capricórnio (Ascendente/Lua)', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Aproveite a energia para organizar a sua rotina sem se cobrar demais.'),
-                  ],
-                ),
-              ),
-            ),
             const SizedBox(height: 25),
             Text(
               'Meu Diário Mágico',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 10),
-            TextField(
-              controller: _tarotController,
-              maxLines: 2,
-              decoration: const InputDecoration(
-                labelText: 'Cartas do Tarô...',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.style),
-              ),
+            const Text(
+              'Registre suas tiragens de Tarô, humores e reflexões. Seus segredos estão salvos localmente e seguros.',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
             ),
             const SizedBox(height: 15),
-            TextField(
-              controller: _pensamentosController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Reflexões e Humores...',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.psychology),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+            
+            // Campo de texto expandido que salva sozinho!
+            Expanded(
+              child: TextField(
+                controller: _pensamentosController,
+                maxLines: null,
+                expands: true,
+                onChanged: _saveDiary, // Chama a função de salvar no banco a cada tecla!
+                textAlignVertical: TextAlignVertical.top,
+                decoration: InputDecoration(
+                  hintText: 'Querido diário cósmico...',
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16), 
+                    borderSide: BorderSide.none,
+                  ),
                 ),
-                onPressed: () {
-                  _tarotController.clear();
-                  _pensamentosController.clear();
-                },
-                child: const Text('Salvar Registro do Dia'),
               ),
             ),
           ],

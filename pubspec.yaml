@@ -27,9 +27,13 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
+
 dependencies:
   flutter:
     sdk: flutter
+  sqflite: ^2.3.0    # Banco de dados SQLite
+  path: ^1.8.3       # Manipulação de caminhos de arquivos
+  intl: ^0.18.1      # Formatação de datas
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

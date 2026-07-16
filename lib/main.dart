@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'telas/tela_principal.dart';
+import 'servicos/database_helper.dart'; // <-- Importamos o nosso novo serviço de dados!
 
-void main() {
+void main() async {
+  // Garante que os recursos nativos do Flutter estão prontos antes de abrir o banco
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Inicializa o banco de dados local
+  await DatabaseHelper.instance.database; 
+  
   runApp(const MyApp());
 }
+
+// O restante da classe MyApp continua exatamente igual!
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
